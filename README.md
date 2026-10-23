@@ -1,8 +1,17 @@
+## Live Application
+
+**Dashboard:** https://kqzwr.vercel.app
+
+**GitHub:** https://github.com/Devkhunger/kqzwr
+
+**Stack:** React, Vite, FastAPI, Python, Docker
+
+**Data:** Elexon BMRS WINDFOR and FUELHH
 # WindScope — day-ahead wind procurement intelligence
 
 An anonymous, client-oriented proof of concept for evaluating historic GB day-ahead wind generation forecasts. **React + Vite frontend, Python + FastAPI backend, Docker, Elexon BMRS WINDFOR and FUELHH datasets.**
 
-> **Data honesty:** The repository does NOT contain a fabricated January 2026 Elexon dataset. Until `data/january_2026.json` has been populated by the real Elexon importer, the interface enters a prominently labeled **SIMULATED DEMO** mode. Never quote demo metrics as January 2026 findings. A successful production submission should include the imported actual snapshot after independent data-quality verification.
+>**Data provenance:** This repository includes a January 2026 Elexon data snapshot in `data/january_2026.json`, generated using `scripts/sync_data.py`. The application uses WINDFOR forecasts and FUELHH WIND actuals. If the snapshot is unavailable, the dashboard explicitly labels its illustrative sample data. The historical dataset requires source-level validation before operational use.
 
 ## Product purpose
 
@@ -24,7 +33,7 @@ docker compose up --build
 # Open http://localhost:8080
 ```
 
-By default, the UI clearly displays synthetic *sample data* to demonstrate behaviour. To use the historical Elexon dataset instead:
+The bundled January 2026 snapshot is used when available. To regenerate the historical dataset from Elexon, run:
 
 ```bash
 python -m pip install -r requirements.txt
@@ -88,7 +97,12 @@ If no publication is eligible, the forecast is **missing**, not 0. Late forecast
 | Coverage (%) | matched hours / 744 hours | Share with measurable performance |
 | P90 abs error (MW) | 90th percentile of `abs(e)` | Retrospective magnitude; **not** a point-in-time risk bound |
 | Wind overforecast exposure (MWh) | `sum(max(e,0) × 1.0)` | Potential additional energy associated with overforecast wind; **not** net purchased energy |
+## AI Assistance
 
+ChatGPT was used to assist with application architecture,
+code generation, debugging, test development, and documentation.
+The application was built and tested locally using Docker
+and deployed to Vercel.
 ### Important assumptions / limitations
 
 **Mixed source resolutions:** WINDFOR publishes hourly forecasts, while FUELHH actuals are half-hourly. The backtest therefore evaluates **744 hourly forecast targets** (31 × 24), comparing each forecast with the simple average of its two constituent FUELHH observations. This is a power-level approximation for the hour rather than a claim that WINDFOR published distinct half-hour predictions. Any missing constituent reading leaves the hour missing. The original FUELHH half-hour records remain intact in the downloaded source snapshot.
